@@ -1,3 +1,5 @@
+import json
+
 import scrapy
 
 
@@ -7,12 +9,12 @@ class ImmoscoutSpider(scrapy.Spider):
     start_urls = ['https://www.immoscout24.ch/fr/immobilier/acheter/canton-geneve']
 
     def parse(self, response):
-        articles = response.xpath('//article')
-        for article in articles:
-            header = article.xpath('.//h3/a/text()').re(r'\d[\d,]*')
-            price = article.xpath('.//h3/a/span/text()').re(r'\d[\d ]*')
+        data_js = response.xpath('//script[@id="state"]/text()').re(r'{.*')[0]
+        data_js = data_js.replace(':undefined', ':""')
+        data = json.loads(data_js)
+        for listing in data['pages']['searchResult']['resultData']['listData']:
             yield {
-                'rooms': header[0].replace(',', '.') if header else None,
-                'area': header[1] if header else None,
-                'price': price[0].replace(' ', '')
+                'rooms': listing.get('numberOfRooms', None),
+                'area': listing.get('surfaceLiving', None),
+                'price': listing['sellingPrice']
             }
