@@ -45,7 +45,9 @@ class ImmoscoutSpider(scrapy.Spider):
                 'area': listing.get('surfaceLiving', None),
                 'price': listing.get('sellingPrice', None),
                 'city': listing.get('cityName', None),
-                'canton': listing.get('state', None)
+                'canton': listing.get('state', None),
+                'type': {1: 'appartment',
+                         2: 'house'}[listing.get('propertyCategoryId')]
             }
         page_number_param_ix = response.url.find('pn=')
         page_number = int(response.url[page_number_param_ix + 3:])
