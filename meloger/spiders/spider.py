@@ -6,6 +6,7 @@ import scrapy
 class ImmoscoutSpider(scrapy.Spider):
     name = 'immoscout'
     allowed_domains = ['www.immoscout24.ch']
+    root = 'https://www.immoscout24.ch'
     start_urls = [
         'https://www.immoscout24.ch/fr/immobilier/acheter/canton-appenzell-re?pn=1',
         'https://www.immoscout24.ch/fr/immobilier/acheter/canton-appenzell-ri?pn=1',
@@ -47,7 +48,8 @@ class ImmoscoutSpider(scrapy.Spider):
                 'city': listing.get('cityName', None),
                 'canton': listing.get('state', None),
                 'type': {1: 'appartment',
-                         2: 'house'}[listing.get('propertyCategoryId')]
+                         2: 'house'}[listing.get('propertyCategoryId')],
+                'url': self.root + listing.get('propertyDetailUrl')
             }
         page_number_param_ix = response.url.find('pn=')
         page_number = int(response.url[page_number_param_ix + 3:])
